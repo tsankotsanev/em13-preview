@@ -1,0 +1,431 @@
+/* ЕМ-13 — вариант S1. Идея: страницата е зидана — блокове на превръзка, разделени от сиви фуги. */
+
+@font-face {
+  font-family: 'Exo 2';
+  font-style: normal;
+  font-weight: 200 700;
+  font-display: swap;
+  src: url(assets/fonts/Exo2-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Exo 2';
+  font-style: normal;
+  font-weight: 200 700;
+  font-display: swap;
+  src: url(assets/fonts/Exo2-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(assets/fonts/OpenSans-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(assets/fonts/OpenSans-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --black: #000;
+  --white: #fff;
+  --text: #2e2e2e;      /* 13.4:1 на бяло */
+  --muted: #555;        /* 7.5:1 на бяло */
+  --mortar: #d4d4d2;    /* фуга */
+  --mortar-light: #ececea;
+  --red: #e50000;       /* 4.9:1 с бяло */
+  --red-deep: #b80000;
+
+  --display: 'Exo 2', 'Arial Narrow', Arial, sans-serif;
+  --body: 'Open Sans', Arial, sans-serif;
+
+  --joint: 10px;
+  --wrap: 1320px;
+  --pad: clamp(18px, 4vw, 48px);
+  --head-h: 76px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 96px; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--white); color: var(--text);
+  font-family: var(--body); font-size: 18px; line-height: 1.6;
+  overflow-x: clip;
+}
+h1, h2, h3, p, ul, dl, dd, figure, blockquote { margin: 0; padding: 0; }
+ul { list-style: none; }
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--display); color: var(--black); font-weight: 600; line-height: 1.1; }
+.defs { position: absolute; }
+.ic { width: 22px; height: 22px; fill: currentColor; flex: none; }
+
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btn--red:focus-visible, .fb :focus-visible { outline-color: var(--black); box-shadow: 0 0 0 6px var(--white); }
+
+.skip { position: absolute; left: 12px; top: -80px; z-index: 100; background: var(--black); color: var(--white); padding: 12px 18px; font-weight: 600; }
+.skip:focus { top: 12px; }
+
+.wrap { width: 100%; max-width: calc(var(--wrap) + 2 * var(--pad)); margin-inline: auto; padding-inline: var(--pad); }
+
+/* Бутони */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; padding: 10px 18px;
+  font-family: var(--display); font-weight: 600; font-size: 18px; line-height: 1.15;
+  text-decoration: none; white-space: nowrap; border: 2px solid transparent;
+  transition: background-color .15s, color .15s, border-color .15s;
+}
+.btn--red { background: var(--red); color: var(--white); }
+.btn--red:hover { background: var(--red-deep); }
+.btn--line { background: var(--white); color: var(--black); border-color: var(--black); }
+.btn--line:hover { background: var(--black); color: var(--white); }
+.btn--line .ic { color: var(--red); }
+.btn--line:hover .ic { color: var(--white); }
+.btn--big { min-height: 56px; padding: 12px 24px; font-size: 19px; }
+.btn--full { width: 100%; }
+
+/* ---------- Горна лента ---------- */
+.top {
+  position: sticky; top: -64px; z-index: 50;
+  background: var(--white); border-bottom: 1px solid var(--mortar);
+}
+.top__in {
+  display: grid; grid-template-columns: 1fr;
+  max-width: calc(var(--wrap) + 2 * var(--pad)); margin-inline: auto;
+}
+.top__logo { display: flex; align-items: center; height: 64px; padding-inline: var(--pad); justify-self: start; }
+.top__logo img { height: 34px; width: auto; }
+.top__nav { display: none; }
+.top__acts { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--mortar); border-top: 1px solid var(--mortar); }
+.top__acts .btn { min-height: 56px; padding: 8px 8px; gap: 8px; border: 0; font-size: 18px; white-space: normal; text-align: center; }
+.top__acts .btn--line:hover { background: var(--black); }
+
+@media (min-width: 900px) {
+  .top { top: 0; }
+  .top__in { grid-template-columns: auto 1fr auto; align-items: center; gap: 24px; padding-inline: var(--pad); height: var(--head-h); }
+  .top__logo { padding: 0; height: auto; }
+  .top__logo img { height: 40px; }
+  .top__acts { display: flex; gap: 10px; background: none; border: 0; }
+  .top__acts .btn { min-height: 48px; padding: 10px 18px; white-space: nowrap; font-size: 18px; }
+  .top__acts .btn--line { border: 2px solid var(--black); }
+}
+@media (min-width: 1180px) {
+  .top__nav { display: flex; justify-content: center; gap: 4px; }
+  .top__nav a {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 0 12px;
+    font-family: var(--display); font-weight: 500; font-size: 18px; color: var(--black); text-decoration: none;
+    border-bottom: 3px solid transparent;
+  }
+  .top__nav a:hover { border-bottom-color: var(--red); }
+  .top__fb .ic { width: 20px; height: 20px; color: var(--red); }
+}
+
+/* ---------- Херо: зид на превръзка ---------- */
+.wall {
+  display: grid; gap: var(--joint); padding: var(--joint);
+  background: var(--mortar);
+  grid-template-columns: 1fr;
+  grid-template-areas: "a" "b" "title" "lead";
+}
+.wall__photo { display: block; background: var(--white); }
+.wall__photo img { width: 100%; height: auto; aspect-ratio: 1125 / 675; object-fit: contain; }
+.wall__photo--a { grid-area: a; }
+.wall__photo--b { grid-area: b; }
+.wall__block { background: var(--white); padding: clamp(24px, 4vw, 56px) clamp(20px, 4vw, 56px); }
+.wall__block--title { grid-area: title; display: flex; align-items: flex-end; }
+.wall__block--lead { grid-area: lead; display: flex; flex-direction: column; justify-content: center; }
+
+h1 {
+  font-weight: 700; font-size: clamp(2.35rem, 5.2vw, 4.6rem); line-height: .98;
+  letter-spacing: -.02em; max-width: 13ch; text-wrap: balance;
+}
+.lead { font-size: clamp(1.125rem, 1.35vw, 1.25rem); max-width: 50ch; color: var(--text); }
+.note { margin-top: 10px; color: var(--muted); }
+.wall__cta { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; }
+.wall__cta .btn { white-space: normal; text-align: center; }
+
+@media (min-width: 900px) {
+  /* Две редици. Фугите се разминават: 1-ва ред — текст | снимка, 2-ри ред — снимка | текст. */
+  .wall {
+    grid-template-columns: minmax(0, 1fr) minmax(0, .22fr) minmax(0, 1fr);
+    grid-template-areas:
+      "title title a"
+      "b     lead  lead";
+    max-width: 1600px; margin-inline: auto;
+  }
+  .wall__photo { display: flex; align-items: center; }
+  .wall__block--title { padding-bottom: clamp(28px, 3.4vw, 52px); }
+}
+@media (min-width: 900px) and (max-width: 1279px) {
+  /* Средна ширина: снимките по-тесни, за да побере текстът до втората снимка */
+  .wall { grid-template-columns: minmax(0, 1fr) minmax(0, .5fr) minmax(0, 1fr); }
+  .wall__block { padding: 28px 32px; }
+  .wall__cta .btn--big { min-height: 52px; padding: 10px 18px; }
+}
+@media (min-width: 900px) {
+  .top__acts { grid-column: 3; }
+}
+@media (min-width: 1600px) {
+  .wall { max-width: none; padding-inline: calc((100% - 1600px) / 2 + var(--joint)); }
+}
+
+/* ---------- Гнайс ---------- */
+.gnais { padding: clamp(64px, 9vw, 120px) 0 clamp(64px, 8vw, 104px); }
+h2 { font-weight: 600; font-size: clamp(2.1rem, 4.4vw, 3.6rem); letter-spacing: -.015em; }
+.gnais__head { display: grid; gap: 36px; }
+.gnais__text { margin-top: 20px; max-width: 62ch; }
+@media (min-width: 1000px) {
+  .gnais__head { grid-template-columns: 1.35fr 1fr; gap: 72px; align-items: end; }
+}
+
+/* Легенда: ширините на лентите са начертани в мащаб 2 px = 1 см */
+.forms-key { display: grid; gap: var(--joint); background: var(--mortar); padding: var(--joint); }
+.forms-key__row { background: var(--white); padding: 20px 22px; }
+.forms-key h3 { font-size: 1.4rem; }
+.forms-key p { margin-top: 4px; color: var(--muted); }
+.scale { margin-top: 14px; display: grid; gap: 10px; }
+.scale li { display: grid; grid-template-columns: 1fr 64px; align-items: center; gap: 16px; font-family: var(--display); font-weight: 600; color: var(--black); }
+.scale__bar { display: block; height: calc(var(--h) * 2px); background: #7a7a78; order: -1; }
+
+.board__hint { margin: clamp(40px, 5vw, 64px) 0 16px; color: var(--muted); }
+
+/* Табло с ленти: на тесен екран всички цветове са отворени един под друг */
+.board { display: grid; gap: var(--joint); background: var(--mortar); padding: var(--joint); }
+.strip { position: relative; background: var(--white); display: grid; }
+.strip__feat { display: block; overflow: hidden; }
+.strip__feat img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.strip__plate { padding: 20px 20px 24px; }
+.strip h3 { font-size: clamp(1.75rem, 3vw, 2.25rem); }
+.strip__tab {
+  all: unset; display: block; font: inherit; color: inherit;
+}
+.strip__tab:disabled { cursor: default; }
+.strip__detail { margin-top: 12px; }
+
+.forms { display: grid; border-top: 1px solid var(--mortar); }
+.forms div { display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--mortar); }
+.forms dt { flex: 0 0 116px; color: var(--muted); }
+.forms dd { font-family: var(--display); font-weight: 600; font-size: 19px; color: var(--black); }
+
+.thumbs { margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }
+.thumbs a { display: block; text-decoration: none; color: var(--text); }
+.thumbs img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.thumbs span { display: block; margin-top: 6px; font-size: 16px; line-height: 1.3; }
+.thumbs a:hover span { color: var(--red-deep); text-decoration: underline; }
+
+@media (min-width: 640px) and (max-width: 1099px) {
+  .board { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 1100px) {
+  .board { display: flex; height: 660px; }
+  .strip {
+    display: block; flex: 1 1 0; min-width: 0; overflow: hidden;
+    transition: flex-grow .5s cubic-bezier(.3, .7, .2, 1);
+  }
+  .strip.is-open { flex-grow: 6; }
+  .strip__feat { position: absolute; inset: 0; }
+  .strip__feat img { height: 100%; aspect-ratio: auto; }
+  .strip__plate { padding: 0; }
+
+  /* Затворена лента: целият камък е бутон, името стои на бяла табелка долу */
+  .strip:not(.is-open) .strip__tab {
+    position: absolute; inset: 0; z-index: 2; cursor: pointer;
+    display: flex; align-items: flex-end;
+  }
+  .strip:not(.is-open) .strip__name {
+    display: block; width: 100%; min-height: 80px; padding: 12px 14px;
+    background: var(--white); font-size: 19px; line-height: 1.2;
+    border-top: 4px solid var(--white); transition: border-color .15s;
+  }
+  .strip:not(.is-open) .strip__tab:hover .strip__name { border-top-color: var(--red); }
+  .strip:not(.is-open) .strip__tab:focus-visible { outline-offset: -8px; }
+  .strip:not(.is-open) .strip__detail { display: none; }
+
+  /* Отворена лента: бяла плоча долу вляво с размерите и снимките */
+  .strip.is-open .strip__plate {
+    position: absolute; left: 0; bottom: 0; z-index: 2;
+    width: min(480px, 100%); background: var(--white);
+    padding: 24px 26px 26px;
+    animation: plate-in .35s .2s both ease-out;
+  }
+  .strip.is-open .strip__tab { cursor: default; }
+  .strip.is-open h3 { font-size: 2.25rem; }
+  .thumbs { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .thumbs img { aspect-ratio: 3 / 2; }
+}
+@keyframes plate-in { from { opacity: 0; transform: translateY(8px); } }
+.strip__tab:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+@media (max-width: 639px) {
+  .thumbs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .thumbs span { font-size: 16px; }
+}
+
+/* ---------- Още камък / Материали: блокове на превръзка ---------- */
+.course { padding: clamp(64px, 8vw, 104px) 0; }
+.course--grey { background: var(--mortar-light); }
+.course__head { display: grid; gap: 12px; margin-bottom: clamp(28px, 3.5vw, 44px); }
+.course__head p { color: var(--muted); max-width: 50ch; }
+@media (min-width: 900px) {
+  .course__head { grid-template-columns: 1fr auto; align-items: end; gap: 48px; }
+  .course__head p { text-align: right; }
+}
+
+.bond { display: grid; gap: var(--joint); background: var(--mortar); padding: var(--joint); grid-template-columns: 1fr; }
+.brick { background: var(--white); display: flex; flex-direction: column; min-width: 0; }
+.brick__img { display: block; overflow: hidden; }
+.brick__img img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; transition: transform .4s ease; }
+.brick__img:hover img { transform: scale(1.03); }
+.brick__txt { padding: 18px 20px 22px; }
+.brick h3 { font-size: 1.5rem; }
+.brick p { margin-top: 6px; color: var(--muted); max-width: 46ch; }
+.brick--list { justify-content: center; }
+.brick--list .brick__txt { padding: clamp(22px, 3vw, 36px); }
+.brick--list ul { margin-top: 14px; display: grid; gap: 0 32px; }
+.brick--list li { padding: 10px 0; border-bottom: 1px solid var(--mortar); }
+
+@media (min-width: 640px) {
+  .bond { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .brick--list { grid-column: 1 / -1; }
+  .brick--list ul { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 1000px) {
+  /* Още камък: 12 колони, фугите на втория ред са отместени */
+  .bond--stone { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .bond--stone .brick:nth-child(1) { grid-column: span 5; }
+  .bond--stone .brick:nth-child(2) { grid-column: span 7; }
+  .bond--stone .brick:nth-child(3) { grid-column: span 7; }
+  .bond--stone .brick:nth-child(4) { grid-column: span 5; }
+  .bond--stone .brick__img img { aspect-ratio: auto; height: 340px; }
+
+  /* Материали: 6 колони — 2/2/2, после 3/3, после 2/4 */
+  .bond--mats { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .bond--mats .brick { grid-column: span 2; }
+  .bond--mats .brick:nth-child(4), .bond--mats .brick:nth-child(5) { grid-column: span 3; }
+  .bond--mats .brick:nth-child(4) .brick__img img, .bond--mats .brick:nth-child(5) .brick__img img { aspect-ratio: auto; height: 300px; }
+  .bond--mats .brick--list { grid-column: span 4; }
+}
+
+/* ---------- Доставка ---------- */
+.truck { background: var(--black); color: #e6e6e6; padding: clamp(64px, 8vw, 104px) 0; }
+.truck h2 { color: var(--white); }
+.truck__grid { display: grid; gap: var(--joint); }
+.truck__pic { display: block; overflow: hidden; }
+.truck__pic img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.truck__text { padding: clamp(8px, 2vw, 24px) 0 clamp(16px, 3vw, 32px); }
+.truck__text > p { margin-top: 18px; max-width: 46ch; }
+.tons { margin-top: 28px; display: grid; border-top: 1px solid #444; }
+.tons div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 20px; padding: 16px 0; border-bottom: 1px solid #444; }
+.tons dt { font-family: var(--display); font-weight: 700; font-size: clamp(1.9rem, 3.4vw, 2.6rem); color: var(--white); line-height: 1.1; min-width: 6.2ch; }
+.tons dd { color: #c9c9c9; }
+.truck__call { margin-top: 24px; }
+.truck__call a { color: var(--white); font-weight: 700; white-space: nowrap; text-decoration-color: var(--red); text-decoration-thickness: 3px; text-underline-offset: 6px; }
+.truck :focus-visible { outline-color: var(--white); }
+@media (min-width: 1000px) {
+  .truck__grid { grid-template-columns: 1.25fr 1fr; grid-template-areas: "main text" "main side"; gap: var(--joint) clamp(32px, 4vw, 64px); }
+  .truck__pic--main { grid-area: main; }
+  .truck__pic--main img { height: 100%; aspect-ratio: auto; min-height: 560px; }
+  .truck__text { grid-area: text; padding-top: 0; }
+  .truck__pic--side { grid-area: side; }
+  .truck__pic--side img { aspect-ratio: 16 / 9; }
+}
+
+/* ---------- За нас ---------- */
+.about { padding: clamp(64px, 9vw, 128px) 0; }
+.about__grid { display: grid; gap: clamp(32px, 5vw, 72px); }
+.about__pic img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.about h2 { font-size: clamp(1.5rem, 2.2vw, 1.9rem); color: var(--red-deep); }
+.about blockquote { margin-top: 18px; }
+.about blockquote p {
+  font-family: var(--display); font-weight: 400; color: var(--black);
+  font-size: clamp(1.6rem, 2.9vw, 2.45rem); line-height: 1.22; letter-spacing: -.01em; max-width: 30ch;
+}
+.about blockquote footer { margin-top: 20px; font-family: var(--display); font-weight: 600; font-size: 1.3rem; color: var(--black); }
+.about__text > p { margin-top: 28px; max-width: 60ch; color: var(--muted); }
+@media (min-width: 900px) {
+  .about__grid { grid-template-columns: 5fr 7fr; align-items: center; }
+  .about__pic img { aspect-ratio: 3 / 4; }
+}
+
+/* ---------- Facebook ---------- */
+.fb { background: var(--mortar-light); border-top: var(--joint) solid var(--mortar); border-bottom: var(--joint) solid var(--mortar); padding: clamp(40px, 5vw, 64px) 0; }
+.fb__in { display: grid; gap: 20px; justify-items: start; }
+.fb__icon { width: 64px; height: 64px; padding: 12px; background: var(--black); fill: var(--white); }
+.fb h2 { font-size: clamp(1.8rem, 3.2vw, 2.6rem); }
+.fb__text p { margin-top: 8px; font-size: 1.15rem; }
+.fb .btn { white-space: normal; text-align: center; }
+@media (min-width: 900px) {
+  .fb__in { grid-template-columns: auto 1fr auto; align-items: center; gap: 32px; }
+}
+
+/* ---------- Как да стигнете ---------- */
+.find { padding: clamp(64px, 8vw, 104px) 0; }
+.find__grid { margin-top: clamp(28px, 3.5vw, 44px); display: grid; gap: var(--joint); background: var(--mortar); padding: var(--joint); }
+.find__map { background: var(--white); min-height: 360px; }
+.find__map iframe { display: block; width: 100%; height: 100%; min-height: 360px; border: 0; }
+.find__info { display: grid; gap: var(--joint); }
+.find__block { background: var(--white); padding: 24px clamp(20px, 2.5vw, 32px) 28px; }
+.find__block h3 { font-size: 1.35rem; color: var(--muted); font-weight: 500; }
+.find__addr { margin: 8px 0 20px; font-family: var(--display); font-weight: 600; font-size: clamp(1.5rem, 2.4vw, 1.9rem); line-height: 1.2; color: var(--black); }
+.find .btn { white-space: normal; text-align: center; }
+.hours { margin-top: 10px; display: grid; }
+.hours div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--mortar); }
+.hours dd { font-family: var(--display); font-weight: 600; font-size: 1.25rem; color: var(--black); white-space: nowrap; }
+.phones { margin-top: 10px; display: grid; gap: 4px; }
+.phones a {
+  display: inline-flex; align-items: center; gap: 12px; min-height: 52px;
+  font-family: var(--display); font-weight: 700; font-size: clamp(1.6rem, 2.4vw, 1.9rem); color: var(--black); text-decoration: none;
+}
+.phones .ic { width: 26px; height: 26px; color: var(--red); }
+.phones a:hover { color: var(--red-deep); }
+@media (min-width: 1000px) {
+  .find__grid { grid-template-columns: 1.5fr 1fr; }
+  .find__map, .find__map iframe { min-height: 620px; }
+}
+
+/* ---------- Долна лента ---------- */
+.foot { border-top: var(--joint) solid var(--mortar); padding: 36px 0 44px; }
+.foot__in { display: grid; gap: 18px; justify-items: start; }
+.foot img { height: 34px; width: auto; }
+.foot p { color: var(--muted); font-size: 18px; max-width: 60ch; }
+.foot__fb { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; font-family: var(--display); font-weight: 600; color: var(--black); text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.foot__fb .ic { color: var(--red); }
+@media (min-width: 900px) {
+  .foot__in { grid-template-columns: auto 1fr auto; align-items: center; gap: 40px; }
+}
+
+/* ---------- Снимка в голям размер ---------- */
+.lb { padding: 0; border: 0; background: transparent; max-width: 100vw; max-height: 100vh; width: 100vw; height: 100vh; }
+.lb::backdrop { background: rgba(0, 0, 0, .92); }
+.lb figure { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 72px 16px 24px; }
+.lb img { max-width: min(1200px, 100%); max-height: calc(100vh - 150px); width: auto; object-fit: contain; }
+.lb figcaption { margin-top: 14px; color: var(--white); text-align: center; font-size: 18px; }
+.lb__btn {
+  position: fixed; width: 56px; height: 56px; display: grid; place-items: center;
+  background: var(--white); border: 0; cursor: pointer;
+}
+.lb__btn svg { width: 28px; height: 28px; fill: none; stroke: var(--black); stroke-width: 2.4; }
+.lb__btn:hover { background: var(--red); }
+.lb__btn:hover svg { stroke: var(--white); }
+.lb__btn:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.lb__close { top: 12px; right: 12px; }
+.lb__prev { left: 12px; top: 50%; transform: translateY(-50%); }
+.lb__next { right: 12px; top: 50%; transform: translateY(-50%); }
+.lb--single .lb__prev, .lb--single .lb__next { display: none; }
+@media (max-width: 640px) {
+  .lb__prev, .lb__next { top: auto; bottom: 12px; transform: none; }
+  .lb figure { padding-bottom: 84px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

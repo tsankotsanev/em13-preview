@@ -58,6 +58,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-padding-top: calc(var(--head-h) + 16px); -webkit-text-size-adjust: 100%; scrollbar-color: #b9b2aa var(--stone); }
+@media (max-width: 719px) { html { scroll-padding-top: 136px; } }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body {
   margin: 0;
@@ -89,40 +90,54 @@ ul[role="list"] { list-style: none; margin: 0; padding: 0; }
   backdrop-filter: saturate(1.4) blur(8px);
 }
 .top__in {
-  height: var(--head-h);
-  display: flex; align-items: center; gap: 24px;
+  min-height: var(--head-h);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; padding-block: 8px;
   max-width: calc(var(--wrap) + 2 * var(--gutter)); margin-inline: auto; padding-inline: var(--gutter);
 }
 .top__logo { display: block; flex: none; padding: 6px 0; }
 .top__logo img { height: 28px; width: auto; }
 .top__nav { display: none; }
-.top__phones { margin-left: auto; display: flex; align-items: center; gap: 22px; }
+.top__phones { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .phone { text-decoration: none; font-family: var(--display); font-weight: 600; letter-spacing: .02em; white-space: nowrap; }
-.phone--alt { display: none; color: var(--ink); font-size: 16px; padding: 10px 0; }
-.phone--alt:hover { color: var(--red); }
+.phone--main, .btn-out {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 10px; border-radius: 3px;
+  font-size: 16px; white-space: nowrap; text-decoration: none;
+}
 .phone--main {
-  display: inline-flex; align-items: center; gap: 8px;
-  min-height: 44px; padding: 0 14px;
-  background: var(--red); color: #fff; font-size: 17px; border-radius: 3px;
+  background: var(--red); color: #fff;
   transition: background-color .2s;
 }
 .phone--main:hover { background: var(--red-deep); }
 .phone--main:focus-visible, .call:focus-visible { outline-color: var(--ink); }
+.btn-out {
+  border: 2px solid var(--ink); color: var(--ink); background: #fff;
+  font-family: var(--display); font-weight: 600; letter-spacing: .01em;
+  transition: background-color .2s, color .2s;
+}
+.btn-out:hover { background: var(--ink); color: #fff; }
+.pin { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-width: 2; flex: none; }
 
 @media (min-width: 400px) { .top__logo img { height: 30px; } }
+@media (min-width: 720px) {
+  .top__in { flex-wrap: nowrap; padding-block: 0; }
+  .top__phones { width: auto; margin-left: auto; display: flex; gap: 12px; }
+  .phone--main, .btn-out { padding: 0 18px; font-size: 17px; }
+}
 @media (min-width: 960px) {
   .top__logo img { height: 40px; }
-  .top__nav { display: flex; gap: 4px; margin-left: 12px; }
+  .phone--main { padding: 0 20px; font-size: 19px; }
+}
+@media (min-width: 1280px) {
+  .top__nav { display: flex; gap: 2px; margin-left: 4px; }
   .top__nav a {
-    padding: 10px 12px; text-decoration: none;
+    padding: 10px 10px; text-decoration: none; white-space: nowrap;
     font: 600 14.5px/1 var(--body); color: #4a4642;
     text-decoration-line: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 8px;
     transition: color .2s, text-decoration-color .2s;
   }
   .top__nav a:hover { color: var(--ink); text-decoration-color: var(--red); }
-  .phone--main { min-height: 48px; padding: 0 20px; font-size: 19px; }
 }
-@media (min-width: 1180px) { .phone--alt { display: block; } }
 
 @supports (animation-timeline: scroll()) {
   @media (prefers-reduced-motion: no-preference) {
@@ -149,9 +164,9 @@ ul[role="list"] { list-style: none; margin: 0; padding: 0; }
 @media (min-width: 960px) { .hero__go { padding: 14px 22px; font-size: 14px; } }
 
 /* ---------- Intro (h1) ---------- */
-.intro { padding-block: clamp(48px, 8vw, 112px) clamp(56px, 8vw, 120px); }
+.intro { padding-block: clamp(40px, 5vw, 64px) clamp(56px, 8vw, 120px); }
 .intro__grid { display: grid; gap: 28px; }
-@media (min-width: 960px) { .intro__grid { grid-template-columns: 1.4fr 1fr; gap: 72px; align-items: end; } }
+@media (min-width: 960px) { .intro__grid { grid-template-columns: 1.4fr 1fr; gap: 72px; align-items: start; } }
 h1 { font-weight: 500; font-size: clamp(2.25rem, 4.6vw, 3.9rem); line-height: 1.05; letter-spacing: -.015em; }
 .lead { font-size: clamp(1.06rem, 1.4vw, 1.2rem); color: var(--text); max-width: 46ch; }
 .calm { margin-top: 18px; color: var(--muted); font-size: 15.5px; }
@@ -300,13 +315,20 @@ h1 { font-weight: 500; font-size: clamp(2.25rem, 4.6vw, 3.9rem); line-height: 1.
 .contact__info h3 { font: 600 12.5px/1.4 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
 .contact__info p { color: var(--ink); font-size: 18px; }
 .contact__info .hours { max-width: 440px; }
-.link {
-  margin-top: 8px; display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
-  font-weight: 600; color: var(--ink);
-  text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: 6px;
+.btn-big {
+  margin-top: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+  min-height: 56px; padding: 0 24px; border-radius: 3px; max-width: 100%;
+  font: 600 18px/1.2 var(--display); letter-spacing: .02em; color: #fff; text-decoration: none;
+  transition: background-color .2s;
 }
-.link:hover { color: var(--red-deep); }
-.link:hover .ar { transform: translate(2px, -2px); }
+.btn-big .pin, .btn-big .ic { width: 1.2em; height: 1.2em; }
+.btn-big--red { background: var(--red); }
+.btn-big--red:hover { background: var(--red-deep); }
+.btn-big--red:focus-visible { outline-color: var(--ink); }
+.btn-big--dark { background: var(--ink); }
+.btn-big--dark:hover { background: var(--red); }
+.contact__map { margin-top: clamp(40px, 5vw, 64px); }
+.contact__map iframe { display: block; width: 100%; height: clamp(320px, 40vw, 460px); border: 0; filter: grayscale(.2); }
 .hours { margin: 0; display: grid; gap: 8px; }
 .hours div { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
 .hours dt { color: var(--ink); }
